@@ -27,5 +27,13 @@ def index():
     
     return render_template("form.html")
 
+@app.route("/blog-entry", methods=["POST"])
+def blog_entry():
+    title = request.form["blog-title"]
+    body = request.form["blog-content"]
+    return title+"<br>"+body
+
+
+
 if __name__ == "__main__":
     app.run()
