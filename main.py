@@ -34,10 +34,14 @@ def blog_entry():
     post = Blog(title, body)
     db.session.add(post)
     db.session.commit()
+    posts = Blog.query.all()
 
-    return render_template("post.html", title=title, body=body)
+    return render_template("post.html", list=posts)
 
 
 
 if __name__ == "__main__":
     app.run()
+
+
+    
