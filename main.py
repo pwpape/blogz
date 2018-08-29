@@ -31,7 +31,11 @@ def index():
 def blog_entry():
     title = request.form["blog-title"]
     body = request.form["blog-content"]
-    return title+"<br>"+body
+    post = Blog(title, body)
+    db.session.add(post)
+    db.session.commit()
+
+    return render_template("post.html", title=title, body=body)
 
 
 
