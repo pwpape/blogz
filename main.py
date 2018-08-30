@@ -56,7 +56,12 @@ def blog_entry():
             return render_template("form.html", body_value=body, etitle="Title was empty", title_value=body, ebody="Body was empty")
         db.session.add(post)
         db.session.commit()
-        posts = Blog.query.all()
+        blog_post = Blog.query.filter_by(title=title).first()
+        red_id = blog_post.id
+        url = "/?id={id}"
+        return redirect(url.format(id=red_id))
+        #posts = Blog.query.all()
+    
     if not check:
         posts = Blog.query.all()
 
