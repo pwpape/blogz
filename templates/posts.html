@@ -2,12 +2,23 @@
 
 {% block form %}
 
-{% for post in list %}
-<h1>{{post.title}}</h1>
+{% if list|length == 0 %}
+<h1>{{stitle}}</h1>
 
-   
+<div>{{sbody}}</div>
+
+
+{% endif %}
+
+{% if list|length != 0 %}
+{% for post in list %}
+<h1><a href="./?id={{post.id}}">{{post.title}}</a></h1>
+
 <div>{{post.body}}</div>
 
 <hr/>
 {% endfor %}
+{% endif %}
+
+
 {% endblock %}

@@ -32,6 +32,16 @@ def index():
 
 @app.route("/", methods=["GET", "POST"])
 def blog_entry():
+    posts = []
+    check = request.args.get("id")
+    if check:
+        blog_post = Blog.query.filter_by(id=int(check)).first()
+        stitle = blog_post.title
+        sbody = blog_post.body
+    else:
+        stitle = ""
+        sbody = ""
+        
     if request.method == "POST":
         title = request.form["blog-title"]
         body = request.form["blog-content"]
@@ -46,9 +56,11 @@ def blog_entry():
             return render_template("form.html", body_value=body, etitle="Title was empty", title_value=body, ebody="Body was empty")
         db.session.add(post)
         db.session.commit()
-    posts = Blog.query.all()
+        posts = Blog.query.all()
+    if not check:
+        posts = Blog.query.all()
 
-    return render_template("posts.html", list=posts)
+    return render_template("posts.html", list=posts, stitle=stitle, sbody=sbody)
 
 
 
