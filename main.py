@@ -18,8 +18,11 @@ class Blog(db.Model):
         self.title = title
         self.body = body
 
+def check_empty(variable):
+    if variable == "":
+        return True
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/new-entry", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
 
@@ -27,16 +30,25 @@ def index():
     
     return render_template("form.html")
 
-@app.route("/blog-entry", methods=["POST"])
+@app.route("/", methods=["GET", "POST"])
 def blog_entry():
-    title = request.form["blog-title"]
-    body = request.form["blog-content"]
-    post = Blog(title, body)
-    db.session.add(post)
-    db.session.commit()
+    if request.method == "POST":
+        title = request.form["blog-title"]
+        body = request.form["blog-content"]
+        post = Blog(title, body)
+        empty_title = check_empty(title)
+        empty_body = check_empty(body)
+        if empty_title and not empty_body:
+            return render_template("form.html", body_value=body, etitle="Title was empty")
+        if empty_body and not empty_title:
+            return render_template("form.html", title_value=title, ebody="Body was empty")
+        if empty_title and empty_body:
+            return render_template("form.html", body_value=body, etitle="Title was empty", title_value=body, ebody="Body was empty")
+        db.session.add(post)
+        db.session.commit()
     posts = Blog.query.all()
 
-    return render_template("post.html", list=posts)
+    return render_template("posts.html", list=posts)
 
 
 

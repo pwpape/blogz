@@ -1,18 +1,20 @@
 {% extends "base.html" %}
 
 {% block form %}
-<h1>This is the form</h1>
+<h1>Post a new blog entry</h1>
 
 <hr/>
     
-<form action="/blog-entry" method="POST">
-    <label for="title">Enter blog title:</label>
-    <input id="title" type="text" name="blog-title" />
+<form action="/" method="POST">
+    <label for="title">Title:</label>
+    <input id="title" type="text" name="blog-title" value="{{title_value}}"/>
+    <span>{{etitle}}</span>
     
     <br>
 
     <label for="content">Content:</label>
-    <input id="content" type="textarea" name="blog-content" />
+    <input id="content" type="textarea" name="blog-content" value="{{body_value}}"/>
+    <span>{{ebody}}</span>
 
     <br>
 
