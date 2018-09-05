@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block form %}
+
+<form action="/signup" method="POST">
+    <label>Enter username:
+        <input type="text" name="name" value="{{name}}">
+    </label>
+    <span>{{name_error}}</span>
+    
+    <br>
+
+    <label>Enter password:
+        <input type="text" name="pass1" value="{{pass1}}">
+    </label>
+    
+    <span>{{pass1_error}}</span>
+
+    <br>
+
+    <label>Re-enter password:
+        <input type="text" name="pass2" value="{{pass2}}">
+    </label>
+
+    <span>{{pass2_error}}</span>
+
+    <br>
+
+    <label>Enter email:
+        <input type="email" name="email" value="{{email}}">
+    </label>
+
+    <span>{{email_error}}</span>
+
+    <br>
+
+    <input type="submit" value="Enter">
+</form>
+
+{% endblock %}
