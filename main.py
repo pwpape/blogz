@@ -88,24 +88,28 @@ def signup():
         pass1 = request.form["pass1"]
         pass2 = request.form["pass2"]
         email = request.form["email"]
-        if name == "":
-            valid_name = "Field required"
+        existing_user = User.query.filter_by(name=name).first()
+        if not existing_user:
+            if name == "":
+                valid_name = "Field required"
+            else:
+                valid_name = validate_userORpass(name)
+            if pass1 == "":
+                valid_pass = "Field required"
+            else:
+                valid_pass = validate_userORpass(pass1)
+            if valid_pass == "":
+                matching_pass = match_pass(pass1, pass2)
+            if email != "":
+                emailok = check_email(email)
+            if valid_name == "" and valid_pass == "" and matching_pass == "" and emailok == "":
+                new_user = User(name, pass1)
+                db.session.add(new_user)
+                db.session.commit()
+                session["id"] = pass1
+                return redirect("/validated?user={0}".format(name))   
         else:
-            valid_name = validate_userORpass(name)
-        if pass1 == "":
-            valid_pass = "Field required"
-        else:
-            valid_pass = validate_userORpass(pass1)
-        if valid_pass == "":
-            matching_pass = match_pass(pass1, pass2)
-        if email != "":
-            emailok = check_email(email)
-        if valid_name == "" and valid_pass == "" and matching_pass == "" and emailok == "":
-            new_user = User(name, pass1)
-            db.session.add(new_user)
-            db.session.commit()
-            session["id"] = pass1
-            return redirect("/validated?user={0}".format(name))         
+            return redirect("/login")      
     
     return render_template("signup.html", name=name, name_error=valid_name, pass1="", pass1_error=valid_pass, pass2="", pass2_error=matching_pass, email=email, email_error=emailok)
 
@@ -134,10 +138,9 @@ def login():
         else:
             pw_exists = User.query.filter_by(pw_hash=pw).first()
         
-        if name == name_exists and pw == pw_exists:
+        if name == name_exists.name and pw == pw_exists.pw_hash:
             user = User.query.filter_by(name=name).first()
-            id = user.id
-            session["id"] = id
+            session["id"] = user.id
             return redirect("/")         
     
     return render_template("login.html", name=name, name_error=name_exists, pw=pw, pass_error=pw_exists)
@@ -157,7 +160,7 @@ def new_entry():
 @app.route("/", methods=["GET", "POST"])
 def blog_entry():
     posts = []
-    check = request.args.get("id")
+    check = request.args.get("entry")
     if check:
         blog_post = Blog.query.filter_by(id=int(check)).first()
         stitle = blog_post.title
@@ -167,9 +170,10 @@ def blog_entry():
         sbody = ""
         
     if request.method == "POST":
-        title = request.new-post["blog-title"]
-        body = request.new-post["blog-content"]
-        post = Blog(title, body)
+        title = request.form["blog-title"]
+        body = request.form["blog-content"]
+        owner = User.query.filter_by(id=session["id"]).first()
+        post = Blog(title, body, owner)
         empty_title = check_empty(title)
         empty_body = check_empty(body)
         if empty_title and not empty_body:
@@ -182,8 +186,8 @@ def blog_entry():
         db.session.commit()
         blog_post = Blog.query.filter_by(title=title).first()
         red_id = blog_post.id
-        url = "/?id={id}"
-        return redirect(url.format(id=red_id))
+        url = "/?entry={id}"
+        return redirect(url.format(entry=red_id))
         #posts = Blog.query.all()
     
     if not check:
