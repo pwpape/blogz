@@ -115,9 +115,8 @@ def signup():
 
 @app.route("/validated", methods=["GET", "POST"])
 def validated():
-    name = request.args.get("user")
-    #return render_template("validated.html", name=user)
-    return "<h1>Hello"+name+"</h1>"
+    
+    return redirect("/new-entry")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -145,9 +144,10 @@ def login():
     
     return render_template("login.html", name=name, name_error=name_exists, pw=pw, pass_error=pw_exists)
 
-@app.route("/index", methods=["GET", "POST"])
+@app.route("/", methods=["GET", "POST"])
 def index():
-    pass
+    user_list = User.query.all()
+    return render_template("index.html", users=user_list)
 
 @app.route("/new-entry", methods=["GET", "POST"])
 def new_entry():
@@ -157,7 +157,7 @@ def new_entry():
     
     return render_template("new-post.html")
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/user-posts", methods=["GET", "POST"])
 def blog_entry():
     posts = []
     check = request.args.get("entry")
@@ -187,7 +187,7 @@ def blog_entry():
         db.session.commit()
         blog_post = Blog.query.filter_by(title=title).first()
         red_id = blog_post.id
-        url = "/?entry={entry}"
+        url = "/user-posts?entry={entry}"
         return redirect(url.format(entry=red_id))
         #posts = Blog.query.all()
     

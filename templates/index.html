@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block form %}
+
+<h1>Current Users</a></h1>
+<hr/>
+
+{% for name in users %}
+
+
+<div>{{name.name}}</div>
+
+
+{% endfor %}
+
+
+{% endblock %}
