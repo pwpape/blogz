@@ -26,7 +26,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150))
     pw_hash = db.Column(db.String(150))
-    posts = db.relationship("Blog", backref="User")
+    posts = db.relationship("Blog", backref="owner")
 
     def __init__(self, name, password):
         self.name = name
@@ -38,7 +38,7 @@ def check_empty(variable):
 
 @app.route("/logout")
 def logout():
-    del session["email"]
+    del session["id"]
     return redirect("/")
 
 def validate_userORpass(submission):
@@ -106,7 +106,7 @@ def signup():
                 new_user = User(name, pass1)
                 db.session.add(new_user)
                 db.session.commit()
-                session["id"] = pass1
+                session["id"] = new_user.id
                 return redirect("/validated?user={0}".format(name))   
         else:
             return redirect("/login")      
@@ -168,6 +168,7 @@ def blog_entry():
     else:
         stitle = ""
         sbody = ""
+        posts = Blog.query.filter_by(owner_id=session["id"]).all()
         
     if request.method == "POST":
         title = request.form["blog-title"]
@@ -186,12 +187,12 @@ def blog_entry():
         db.session.commit()
         blog_post = Blog.query.filter_by(title=title).first()
         red_id = blog_post.id
-        url = "/?entry={id}"
+        url = "/?entry={entry}"
         return redirect(url.format(entry=red_id))
         #posts = Blog.query.all()
     
     if not check:
-        posts = Blog.query.all()
+        posts = Blog.query.filter_by(owner_id=session["id"]).all()
 
     return render_template("posts.html", list=posts, stitle=stitle, sbody=sbody)
 
