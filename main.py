@@ -161,11 +161,16 @@ def new_entry():
 def blog_entry():
     posts = []
     check = request.args.get("entry")
+    user_check = request.args.get("user")
     if check:
         blog_post = Blog.query.filter_by(id=int(check)).first()
         stitle = blog_post.title
         sbody = blog_post.body
-    else:
+    elif user_check:
+        stitle = ""
+        sbody = ""
+        posts = Blog.query.filter_by(owner_id=user_check).all()
+    else:    
         stitle = ""
         sbody = ""
         posts = Blog.query.filter_by(owner_id=session["id"]).all()
@@ -189,11 +194,7 @@ def blog_entry():
         red_id = blog_post.id
         url = "/user-posts?entry={entry}"
         return redirect(url.format(entry=red_id))
-        #posts = Blog.query.all()
     
-    if not check:
-        posts = Blog.query.filter_by(owner_id=session["id"]).all()
-
     return render_template("posts.html", list=posts, stitle=stitle, sbody=sbody)
 
 if __name__ == "__main__":

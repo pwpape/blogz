@@ -8,7 +8,7 @@
 {% for name in users %}
 
 
-<div>{{name.name}}</div>
+<div><a href="./user-posts?user={{name.id}}">{{name.name}}</a></div>
 
 
 {% endfor %}
