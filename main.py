@@ -1,6 +1,8 @@
 from flask import Flask, request, redirect, render_template, session, flash
 from flask_sqlalchemy import SQLAlchemy
 import re
+import hashlib
+import string
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -30,16 +32,15 @@ class User(db.Model):
 
     def __init__(self, name, password):
         self.name = name
-        self.pw_hash = password #create hashing function
+        self.pw_hash = hash_pass(password)
+
+def hash_pass(password):
+    return hashlib.sha256(str.encode(password)).hexdigest()
 
 def check_empty(variable):
     if variable == "":
         return True
 
-@app.route("/logout")
-def logout():
-    del session["id"]
-    return redirect("/")
 
 def validate_userORpass(submission):
     if not re.match("...", submission):
@@ -72,6 +73,11 @@ def require_login():
     allowed_routes = ["login", "signup"]
     if request.endpoint not in allowed_routes and "id" not in session:
         return redirect("/login")
+
+@app.route("/logout")
+def logout():
+    del session["id"]
+    return redirect("/")
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
@@ -135,7 +141,7 @@ def login():
         if pw == "":
             pw_exists = "Field required"
         else:
-            pw_exists = User.query.filter_by(pw_hash=pw).first()
+            pw_exists = User.query.filter_by(pw_hash=hash_pass(pw)).first()
         
         if name == name_exists.name and pw == pw_exists.pw_hash:
             user = User.query.filter_by(name=name).first()
