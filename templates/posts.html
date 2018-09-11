@@ -2,7 +2,7 @@
 
 {% block form %}
 
-{% if list|length == 0 %}
+{% if stitle != "" %}
 <h1>{{stitle}}</h1>
 
 <div>{{sbody}}</div>
@@ -10,14 +10,29 @@
 
 {% endif %}
 
-{% if list|length != 0 %}
-{% for post in list %}
+{% if stitle == "" %}
+
+
+{% for post in pages.items %}
 <h1><a href="./user-posts?entry={{post.id}}">{{post.title}}</a></h1>
 
 <div>{{post.body}}</div>
 
 <hr/>
 {% endfor %}
+
+{% if pages.has_prev %}
+<a href="/page-posts?page={{pages.prev_num}}">Previous</a>
+{% else %}
+<span>Previous</span>
+{% endif %}
+
+{% if pages.has_next %}
+<a href="/page-posts?page={{pages.next_num}}">Next</a>
+{% else %}
+<span>Next</span>
+{% endif %}
+
 {% endif %}
 
 

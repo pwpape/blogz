@@ -143,7 +143,7 @@ def login():
         else:
             pw_exists = User.query.filter_by(pw_hash=hash_pass(pw)).first()
         
-        if name == name_exists.name and pw == pw_exists.pw_hash:
+        if name == name_exists.name and hash_pass(pw) == pw_exists.pw_hash:
             user = User.query.filter_by(name=name).first()
             session["id"] = user.id
             return redirect("/")         
@@ -165,7 +165,7 @@ def new_entry():
 
 @app.route("/user-posts", methods=["GET", "POST"])
 def blog_entry():
-    posts = []
+    posts = Blog.query.filter_by(owner_id=session["id"]).paginate(per_page=5)
     check = request.args.get("entry")
     user_check = request.args.get("user")
     if check:
@@ -175,11 +175,11 @@ def blog_entry():
     elif user_check:
         stitle = ""
         sbody = ""
-        posts = Blog.query.filter_by(owner_id=user_check).all()
+        posts = Blog.query.filter_by(owner_id=user_check).paginate(per_page=5)
     else:    
         stitle = ""
         sbody = ""
-        posts = Blog.query.filter_by(owner_id=session["id"]).all()
+        posts = Blog.query.filter_by(owner_id=session["id"]).paginate(per_page=5)
         
     if request.method == "POST":
         title = request.form["blog-title"]
@@ -201,7 +201,15 @@ def blog_entry():
         url = "/user-posts?entry={entry}"
         return redirect(url.format(entry=red_id))
     
-    return render_template("posts.html", list=posts, stitle=stitle, sbody=sbody)
+    return render_template("posts.html", pages=posts, stitle=stitle, sbody=sbody)
+
+@app.route("/page-posts")
+def page_posts():
+    page_check = request.args.get("page")
+    stitle = ""
+    sbody = ""
+    posts = Blog.query.filter_by(owner_id=session["id"]).paginate(page=int(page_check), per_page=5)
+    return render_template("posts.html", pages=posts, stitle=stitle, sbody=sbody)
 
 if __name__ == "__main__":
     app.run()
